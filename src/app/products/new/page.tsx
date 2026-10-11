@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RequireAdmin } from "@/components/admin-provider";
 import { Shell } from "@/components/shell";
-import { EMPTY_FORM, ProductForm } from "@/components/product-form";
+import { EMPTY_FORM, ProductForm, Steps } from "@/components/product-form";
 import { api, type Category } from "@/lib/api";
 
 export default function NewProductPage() {
@@ -19,18 +18,13 @@ export default function NewProductPage() {
   return (
     <RequireAdmin>
       <Shell>
-        <div className="mb-4 text-sm text-muted-foreground">
-          <Link href="/products" className="hover:underline">← Products</Link>
-        </div>
-        <h1 className="text-2xl font-bold">New product</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Create the basics first — gallery and variants unlock on the manage page.
-        </p>
+        <Steps current={1} />
         <div className="mt-4">
           <ProductForm
             initial={EMPTY_FORM}
             categories={categories}
-            submitLabel="Create product"
+            submitLabel="Create & continue to media"
+            backHref="/products"
             onSubmit={async (body) => {
               try {
                 const r = await api<{ product: { id: string } }>("/api/products", { method: "POST", body });

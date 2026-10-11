@@ -1,12 +1,11 @@
 "use client";
 
 import { use, useCallback, useEffect, useState } from "react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RequireAdmin } from "@/components/admin-provider";
 import { Shell } from "@/components/shell";
-import { ProductForm, formFromProduct } from "@/components/product-form";
+import { ProductForm, Steps, formFromProduct } from "@/components/product-form";
 import { ImagesManager } from "@/components/product-images";
 import { VariantsManager } from "@/components/product-variants";
 import { api, type Category, type Product } from "@/lib/api";
@@ -42,36 +41,29 @@ export default function ManageClient({ params }: { params: Promise<{ id: string 
   return (
     <RequireAdmin>
       <Shell>
-        <div className="mb-2 text-sm text-muted-foreground">
-          <Link href="/products" className="hover:underline">← Products</Link>
+        <Steps current={2} />
+        <div className="mt-4">
+          <ProductForm
+            key={`${product.id}-${formKey}`}
+            initial={formFromProduct(product)}
+            categories={categories}
+            submitLabel="Save changes"
+            backHref="/products"
+            onSubmit={async (body) => {
+              try {
+                await api(`/api/products/${product.id}`, { method: "PUT", body });
+                await load();
+                setFormKey((k) => k + 1);
+                setSaved(true);
+                setTimeout(() => setSaved(false), 2000);
+                return null;
+              } catch (err) {
+                return err instanceof Error ? err.message : "Save failed";
+              }
+            }}
+          />
+          {saved && <p className="mt-2 text-sm text-emerald-700">Saved ✓</p>}
         </div>
-        <h1 className="text-2xl font-bold">{product.name}</h1>
-        <p className="text-sm text-muted-foreground">/{product.slug}</p>
-
-        <Card className="mt-4 max-w-3xl">
-          <CardHeader><CardTitle>Details</CardTitle></CardHeader>
-          <CardContent>
-            <ProductForm
-              key={`${product.id}-${formKey}`}
-              initial={formFromProduct(product)}
-              categories={categories}
-              submitLabel="Save changes"
-              onSubmit={async (body) => {
-                try {
-                  await api(`/api/products/${product.id}`, { method: "PUT", body });
-                  await load();
-                  setFormKey((k) => k + 1);
-                  setSaved(true);
-                  setTimeout(() => setSaved(false), 2000);
-                  return null;
-                } catch (err) {
-                  return err instanceof Error ? err.message : "Save failed";
-                }
-              }}
-            />
-            {saved && <p className="mt-2 text-sm text-emerald-700">Saved ✓</p>}
-          </CardContent>
-        </Card>
 
         <Card className="mt-4 max-w-3xl">
           <CardContent className="pt-6">
