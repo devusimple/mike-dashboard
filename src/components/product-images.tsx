@@ -58,7 +58,7 @@ export function ImagesManager({ product, onChange }: { product: Product; onChang
 
   return (
     <div>
-      <h2 className="text-sm font-semibold">Gallery ({images.length}) — ★ = cover & thumbnail</h2>
+      <h2 className="text-sm font-semibold">Gallery ({images.length}) — extra photos, ★ = first shown</h2>
       {images.length === 0 && <p className="mt-1 text-sm text-muted-foreground">No images yet — upload the product thumbnail first.</p>}
       <div className="mt-2 flex flex-wrap gap-2">
         {images.map((img, idx) => (

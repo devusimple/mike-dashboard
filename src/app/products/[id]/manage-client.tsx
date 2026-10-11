@@ -7,6 +7,7 @@ import { RequireAdmin } from "@/components/admin-provider";
 import { Shell } from "@/components/shell";
 import { ProductForm, Steps, formFromProduct } from "@/components/product-form";
 import { ImagesManager } from "@/components/product-images";
+import { ThumbnailManager } from "@/components/product-thumbnail";
 import { VariantsManager } from "@/components/product-variants";
 import { api, type Category, type Product } from "@/lib/api";
 
@@ -64,6 +65,12 @@ export default function ManageClient({ params }: { params: Promise<{ id: string 
           />
           {saved && <p className="mt-2 text-sm text-emerald-700">Saved ✓</p>}
         </div>
+
+        <Card className="mt-4 max-w-3xl">
+          <CardContent className="pt-6">
+            <ThumbnailManager product={product} onChange={load} />
+          </CardContent>
+        </Card>
 
         <Card className="mt-4 max-w-3xl">
           <CardContent className="pt-6">

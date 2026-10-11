@@ -8,6 +8,7 @@ import { api, type Product, type ProductVariant } from "@/lib/api";
 export function VariantsManager({ product, onChange }: { product: Product; onChange: () => Promise<void> }) {
   const [variants, setVariants] = useState<ProductVariant[]>(product.variants ?? []);
   const [name, setName] = useState("");
+  const [value, setValue] = useState("");
   const [sku, setSku] = useState("");
   const [priceTaka, setPriceTaka] = useState("");
   const [stock, setStock] = useState("0");
@@ -29,12 +30,14 @@ export function VariantsManager({ product, onChange }: { product: Product; onCha
         method: "POST",
         body: {
           name: name.trim(),
+          value: value.trim() || undefined,
           sku: sku || undefined,
           priceCents: priceTaka ? Math.round(Number(priceTaka) * 100) : null,
           stock: Number(stock) || 0,
         },
       });
       setName("");
+      setValue("");
       setSku("");
       setPriceTaka("");
       setStock("0");
@@ -73,8 +76,9 @@ export function VariantsManager({ product, onChange }: { product: Product; onCha
         )}
       </div>
       {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
-      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-5">
-        <Input placeholder="Name (e.g. Black / L)" value={name} onChange={(e) => setName(e.target.value)} />
+      <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <Input placeholder="Option (e.g. Size)" value={name} onChange={(e) => setName(e.target.value)} />
+        <Input placeholder="Value (e.g. L)" value={value} onChange={(e) => setValue(e.target.value)} />
         <Input placeholder="SKU" value={sku} onChange={(e) => setSku(e.target.value)} />
         <Input type="number" min={0} step="0.01" placeholder="Price ৳ (empty = base)" value={priceTaka} onChange={(e) => setPriceTaka(e.target.value)} />
         <Input type="number" min={0} placeholder="Stock" value={stock} onChange={(e) => setStock(e.target.value)} />
@@ -94,16 +98,19 @@ function VariantRow({
   onDelete: () => Promise<void>;
 }) {
   const [name, setName] = useState(variant.name);
+  const [value, setValue] = useState(variant.value ?? "");
   const [priceTaka, setPriceTaka] = useState(variant.priceCents != null ? String(variant.priceCents / 100) : "");
   const [stock, setStock] = useState(String(variant.stock));
   const dirty =
     name !== variant.name ||
+    (value.trim() || null) !== variant.value ||
     (priceTaka === "" ? null : Math.round(Number(priceTaka) * 100)) !== variant.priceCents ||
     Number(stock) !== variant.stock;
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-md bg-muted/60 p-2 text-sm">
-      <Input value={name} onChange={(e) => setName(e.target.value)} className="h-8 w-36" title="Name" />
+      <Input value={name} onChange={(e) => setName(e.target.value)} className="h-8 w-28" title="Option name" />
+      <Input value={value} onChange={(e) => setValue(e.target.value)} className="h-8 w-20" title="Value" placeholder="Value" />
       <Input
         value={priceTaka}
         onChange={(e) => setPriceTaka(e.target.value)}
@@ -128,6 +135,7 @@ function VariantRow({
           onClick={() =>
             onSave({
               name,
+              value: value.trim() || null,
               priceCents: priceTaka === "" ? null : Math.round(Number(priceTaka) * 100),
               stock: Number(stock) || 0,
             })
