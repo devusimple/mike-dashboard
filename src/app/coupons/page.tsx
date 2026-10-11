@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -36,20 +37,26 @@ export default function CouponsPage() {
   return (
     <RequireAdmin>
       <Shell>
-        <h1 className="text-2xl font-bold">Coupons</h1>
-        <form onSubmit={create} className="mt-4 flex max-w-md gap-2">
-          <Input required placeholder="CODE" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} className="uppercase" />
-          <Input required type="number" min={1} max={90} placeholder="%" value={percent} onChange={(e) => setPercent(e.target.value)} className="w-24" />
-          <Button type="submit">Add</Button>
-        </form>
-        {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
-        <Card className="mt-4 max-w-2xl">
+        <h1 className="text-2xl font-bold">Coupons ({coupons.length})</h1>
+        <Card className="mt-4">
+          <CardContent className="pt-6">
+            <form onSubmit={create} className="grid gap-2 sm:grid-cols-[1fr_140px_auto]">
+              <Input required placeholder="CODE (e.g. WELCOME10)" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} className="uppercase" />
+              <Input required type="number" min={1} max={90} placeholder="% off" value={percent} onChange={(e) => setPercent(e.target.value)} />
+              <Button type="submit">Add coupon</Button>
+            </form>
+            {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
+          </CardContent>
+        </Card>
+        <Card className="mt-4">
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Code</TableHead>
-                  <TableHead>Off</TableHead>
+                  <TableHead>Discount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Expires</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -57,7 +64,11 @@ export default function CouponsPage() {
                 {coupons.map((c) => (
                   <TableRow key={c.code}>
                     <TableCell className="font-mono font-semibold">{c.code}</TableCell>
-                    <TableCell>{c.percentOff}%</TableCell>
+                    <TableCell>{c.percentOff}% off</TableCell>
+                    <TableCell>{c.active ? <Badge>active</Badge> : <Badge variant="secondary">off</Badge>}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : "—"}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="ghost"
@@ -74,6 +85,13 @@ export default function CouponsPage() {
                     </TableCell>
                   </TableRow>
                 ))}
+                {coupons.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                      No coupons — try WELCOME10 at 10%.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>
