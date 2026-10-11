@@ -33,6 +33,9 @@ function dayKey(d: Date): string {
 export default function OverviewPage() {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [orders, setOrders] = useState<Order[] | null>(null);
+  // Prerender-safe "today": computed on the client after mount.
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => setNow(Date.now()), []);
 
   useEffect(() => {
     api<{ products: Product[] }>("/api/products?all=1&limit=100")
@@ -50,7 +53,8 @@ export default function OverviewPage() {
 
   const series = useMemo(() => {
     const buckets = new Map<string, { label: string; revenue: number; orders: number }>();
-    const today = new Date();
+    if (now === null) return [];
+    const today = new Date(now);
     for (let i = DAYS - 1; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
@@ -68,7 +72,7 @@ export default function OverviewPage() {
       }
     }
     return [...buckets.values()];
-  }, [valid]);
+  }, [valid, now]);
 
   const byStatus = useMemo(() => {
     const counts = new Map<Order["status"], number>();
@@ -87,7 +91,7 @@ export default function OverviewPage() {
   );
 
   const lowStock = (products ?? []).filter((p) => p.isActive && p.stock < 5 && (p.variants?.length ?? 0) === 0);
-  const loaded = products !== null && orders !== null;
+  const loaded = products !== null && orders !== null && now !== null;
 
   return (
     <RequireAdmin>
