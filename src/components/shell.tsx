@@ -11,6 +11,7 @@ import {
   ClipboardList,
   TicketPercent,
   Truck,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ const SECTIONS: { title: string; items: Omit<NavItem, "badge">[] }[] = [
       { href: "/overview", label: "Overview", icon: LayoutDashboard },
       { href: "/products", label: "Products", icon: Package },
       { href: "/categories", label: "Categories", icon: FolderTree },
+      { href: "/users", label: "Users", icon: Users },
     ],
   },
   {

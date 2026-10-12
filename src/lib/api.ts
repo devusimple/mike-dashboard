@@ -78,6 +78,8 @@ export interface User {
   name: string;
   role: "customer" | "admin";
   emailVerified: boolean;
+  disabled?: boolean;
+  createdAt?: string;
 }
 export interface Category {
   id: string;
