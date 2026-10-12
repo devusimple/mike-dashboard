@@ -23,6 +23,7 @@ const STATUS_COLORS: Record<Order["status"], string> = {
   pending: "var(--chart-4)",
   paid: "var(--chart-1)",
   shipped: "var(--chart-2)",
+  delivered: "var(--chart-2)",
   cancelled: "var(--chart-5)",
 };
 
